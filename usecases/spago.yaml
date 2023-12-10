@@ -1,0 +1,10 @@
+package:
+  name: usecases
+  dependencies:
+    - console
+    - effect
+    - prelude
+    - domains
+  test:
+    main: Test.Usecase.Main
+    dependencies: []

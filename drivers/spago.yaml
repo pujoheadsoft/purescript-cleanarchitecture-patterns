@@ -1,0 +1,10 @@
+package:
+  name: drivers
+  dependencies:
+    - console
+    - effect
+    - prelude
+    - gateways
+  test:
+    main: Test.Driver.Main
+    dependencies: []

@@ -1,0 +1,10 @@
+package:
+  name: gateways
+  dependencies:
+    - console
+    - effect
+    - prelude
+    - usecases
+  test:
+    main: Test.Gateway.Main
+    dependencies: []

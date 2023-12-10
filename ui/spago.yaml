@@ -1,0 +1,12 @@
+package:
+  name: ui
+  dependencies:
+    - console
+    - effect
+    - prelude
+    - usecases
+    - gateways
+    - presenters
+    - domains
+    - drivers
+
