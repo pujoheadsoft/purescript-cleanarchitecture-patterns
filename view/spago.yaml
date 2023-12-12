@@ -1,5 +1,5 @@
 package:
-  name: ui
+  name: view
   dependencies:
     - console
     - effect
