@@ -10,4 +10,5 @@ package:
     - domains
     - drivers
     - halogen
+    - affjax-web
   main: UserTodo.Main

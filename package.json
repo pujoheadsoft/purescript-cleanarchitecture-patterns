@@ -1,5 +1,10 @@
 {
   "scripts": {
-    "start": "spago run -p view -m UserTodo.Main"
+    "build": "spago build",
+    "start": "spago run -p view -m UserTodo.Main",
+    "serve": "spago build && esbuild app.js --bundle --outdir=dist --servedir=dist"
+  },
+  "dependencies": {
+    "esbuild": "^0.19.9"
   }
 }
