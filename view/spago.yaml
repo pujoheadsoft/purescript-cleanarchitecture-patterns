@@ -10,3 +10,4 @@ package:
     - domains
     - drivers
     - halogen
+  main: UserTodo.Main

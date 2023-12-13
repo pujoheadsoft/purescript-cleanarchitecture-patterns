@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "start": "spago run -p view -m UserTodo.Main"
+  }
+}

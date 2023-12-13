@@ -1,6 +1,9 @@
-module UserTodo.Main
+module UserTodo.Main where
 
-import prelude
+import Prelude
+
+import Effect (Effect)
+import Effect.Class.Console (log)
 
 main :: Effect Unit
 main = do
