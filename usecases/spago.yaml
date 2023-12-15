@@ -7,4 +7,5 @@ package:
     - domains
   test:
     main: Test.Usecase.Main
-    dependencies: []
+    dependencies:
+      - spec
