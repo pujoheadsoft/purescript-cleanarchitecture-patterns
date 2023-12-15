@@ -12,6 +12,7 @@ type GitHubRepositories
 
 type GitHubRepository
   = { name :: String
+    , url :: String
     , owner :: String
     , updateDate :: String
     }
