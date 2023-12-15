@@ -1,6 +1,7 @@
 {
   "scripts": {
     "build": "spago build",
+    "test": "spago test",
     "clean": "rm -rf output && rm -rf .spago",
     "start": "spago run -p view -m UserTodo.Main",
     "serve": "spago build && esbuild app.js --bundle --outdir=dist --servedir=dist"
