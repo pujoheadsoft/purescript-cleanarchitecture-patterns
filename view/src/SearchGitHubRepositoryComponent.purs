@@ -16,8 +16,8 @@ import Web.Event.Event (Event)
 import Web.Event.Event as Event
 
 data Action
-  = SetUsername String
-  | MakeRequest Event
+  = SetSearchRepositoryName String
+  | SearchRepository Event
 
 component :: forall q i o m. MonadAff m => H.Component q i o m
 component =
@@ -28,38 +28,38 @@ component =
     }
 
 initialState :: forall i. i -> SearchGitHubRepositoryState
-initialState _ = { name: "", repositories: NotAsked }
+initialState _ = { searchRepositoryName: "", repositories: NotAsked }
 
 render :: forall m. SearchGitHubRepositoryState -> H.ComponentHTML Action () m
 render state =
   HH.form
-    [ HE.onSubmit MakeRequest ]
-    [ HH.h1_ [ HH.text "Lookup GitHub user" ]
+    [ HE.onSubmit SearchRepository ]
+    [ HH.h1_ [ HH.text "Search GitHub Repository" ]
     , HH.label_
-        [ HH.div_ [ HH.text "Enter username:" ]
+        [ HH.div_ [ HH.text "Enter repository name:" ]
         , HH.input
-            [ HP.value state.name
-            , HE.onValueInput SetUsername
+            [ HP.value state.searchRepositoryName
+            , HE.onValueInput SetSearchRepositoryName
             ]
         ]
     , HH.button
         [ HP.disabled $ isLoading state.repositories
         , HP.type_ HP.ButtonSubmit
         ]
-        [ HH.text "Fetch info" ]
+        [ HH.text "Search" ]
     , renderRepositories state.repositories
     ]
   where
   renderRepositories = case _ of
     NotAsked ->
       HH.div_
-        [ HH.text "Tags not loaded" ]
+        [ HH.text "Repository not loaded" ]
     Loading ->
       HH.div_
-        [ HH.text "Loading Tags" ]
+        [ HH.text "Loading Repositories" ]
     Failure err ->
       HH.div_
-        [ HH.text $ "Failed loading tags: " <> err ]
+        [ HH.text $ "Failed loading repositories: " <> err ]
     Success repositories ->
       HH.div_
         (map renderRepository repositories)
@@ -72,13 +72,13 @@ render state =
 
 handleAction :: forall o m. MonadAff m => Action -> H.HalogenM SearchGitHubRepositoryState Action () o m Unit
 handleAction = case _ of
-  SetUsername name -> do
-    H.modify_ (_ { name = name, repositories = NotAsked })
-  MakeRequest event -> do
+  SetSearchRepositoryName searchRepositoryName -> do
+    H.modify_ (_ { searchRepositoryName = searchRepositoryName, repositories = NotAsked })
+  SearchRepository event -> do
     H.liftEffect $ Event.preventDefault event
-    username <- H.gets _.name
+    name <- H.gets _.searchRepositoryName
     H.modify_ (_ { repositories = Loading })
     -- curl -H 'Accept: application/vnd.github+json' 'https://api.github.com/search/repositories?q=spago&language:purescript&sort=created&order=desc&page=1&per_page=10'
-    response <- H.liftAff $ AX.get AXRF.string ("https://api.github.com/users/" <> username)
+    response <- H.liftAff $ AX.get AXRF.string ("https://api.github.com/users/" <> name)
     --H.modify_ (_ { result = map _.body (hush response) })
     H.modify_ (_ { repositories = Success [] })

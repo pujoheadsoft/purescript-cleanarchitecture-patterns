@@ -1,3 +1,3 @@
-import { main } from "./output/UserTodo.Main";
+import { main } from "./output/Main";
 
 main();
