@@ -1,10 +1,11 @@
 package:
   name: presenters
   dependencies:
+    - domains
+    - state
     - console
     - effect
     - prelude
-    - domains
   test:
     main: Test.Presenter.Main
     dependencies: []

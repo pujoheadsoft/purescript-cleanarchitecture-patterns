@@ -1,6 +1,7 @@
 package:
   name: view
   dependencies:
+    - state
     - console
     - effect
     - prelude

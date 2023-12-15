@@ -2,23 +2,18 @@ module UserTodo.Component where
 
 import Prelude
 
-import Affjax.Web as AX
 import Affjax.ResponseFormat as AXRF
-import Data.Either (hush)
-import Data.Maybe (Maybe(..))
+import Affjax.Web as AX
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
+import Halogen.HTML (HTML)
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Network.RemoteData (RemoteData(..), isLoading)
+import State.UserTodoState (Todos, UserTodoState, Todo)
 import Web.Event.Event (Event)
 import Web.Event.Event as Event
-
-type State =
-  { loading :: Boolean
-  , username :: String
-  , result :: Maybe String
-  }
 
 data Action
   = SetUsername String
@@ -32,46 +27,58 @@ component =
     , eval: H.mkEval $ H.defaultEval { handleAction = handleAction }
     }
 
-initialState :: forall i. i -> State
-initialState _ = { loading: false, username: "", result: Nothing }
+initialState :: forall i. i -> UserTodoState
+initialState _ = { username: "", todos: NotAsked }
 
-render :: forall m. State -> H.ComponentHTML Action () m
-render st =
+render :: forall m. UserTodoState -> H.ComponentHTML Action () m
+render state =
   HH.form
     [ HE.onSubmit MakeRequest ]
     [ HH.h1_ [ HH.text "Lookup GitHub user" ]
     , HH.label_
         [ HH.div_ [ HH.text "Enter username:" ]
         , HH.input
-            [ HP.value st.username
+            [ HP.value state.username
             , HE.onValueInput SetUsername
             ]
         ]
     , HH.button
-        [ HP.disabled st.loading
+        [ HP.disabled $ isLoading state.todos
         , HP.type_ HP.ButtonSubmit
         ]
         [ HH.text "Fetch info" ]
-    , HH.p_
-        [ HH.text (if st.loading then "Working..." else "") ]
-    , HH.div_
-        case st.result of
-          Nothing -> []
-          Just res ->
-            [ HH.h2_
-                [ HH.text "Response:" ]
-            , HH.pre_
-                [ HH.code_ [ HH.text res ] ]
-            ]
+    , renderTodos state.todos
     ]
+  where
+  renderTodos = case _ of
+    NotAsked ->
+      HH.div_
+        [ HH.text "Tags not loaded" ]
+    Loading ->
+      HH.div_
+        [ HH.text "Loading Tags" ]
+    Failure err ->
+      HH.div_
+        [ HH.text $ "Failed loading tags: " <> err ]
+    Success loadedTodos ->
+      HH.div_
+        (map renderTag loadedTodos)
+  
+  renderTag todo =
+    HH.div_
+      [ HH.text todo.title
+      , HH.text $ show todo.completed
+      ]
 
-handleAction :: forall o m. MonadAff m => Action -> H.HalogenM State Action () o m Unit
+handleAction :: forall o m. MonadAff m => Action -> H.HalogenM UserTodoState Action () o m Unit
 handleAction = case _ of
   SetUsername username -> do
-    H.modify_ (_ { username = username, result = Nothing :: Maybe String })
+    H.modify_ (_ { username = username, todos = NotAsked })
   MakeRequest event -> do
     H.liftEffect $ Event.preventDefault event
     username <- H.gets _.username
-    H.modify_ (_ { loading = true })
+    H.modify_ (_ { todos = Loading })
+    -- curl -H 'Accept: application/vnd.github+json' 'https://api.github.com/search/repositories?q=spago&language:purescript&sort=created&order=desc&page=1&per_page=10'
     response <- H.liftAff $ AX.get AXRF.string ("https://api.github.com/users/" <> username)
-    H.modify_ (_ { loading = false, result = map _.body (hush response) })
+    --H.modify_ (_ { result = map _.body (hush response) })
+    H.modify_ (_ { todos = Success [] })
