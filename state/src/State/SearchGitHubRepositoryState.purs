@@ -1,10 +1,12 @@
 module State.SearchGitHubRepositoryState where
 
-import Network.RemoteData (RemoteData)
+import Data.Either (Either)
+
 
 type SearchGitHubRepositoryState
   = { searchRepositoryName :: String
-    , repositories :: RemoteData String GitHubRepositories
+    , repositories :: Either ErrorMessage GitHubRepositories
+    , isLoading :: Boolean
     }
 
 type GitHubRepositories
@@ -16,3 +18,5 @@ type GitHubRepository
     , owner :: String
     , updateDate :: String
     }
+
+type ErrorMessage = String

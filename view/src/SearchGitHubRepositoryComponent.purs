@@ -36,7 +36,7 @@ component =
     }
 
 initialState :: forall i. i -> SearchGitHubRepositoryState
-initialState _ = { searchRepositoryName: "", repositories: NotAsked }
+initialState _ = { searchRepositoryName: "", repositories: Right [], isLoading: false }
 
 render :: forall m. SearchGitHubRepositoryState -> H.ComponentHTML Action () m
 render state =
@@ -51,7 +51,7 @@ render state =
             ]
         ]
     , HH.button
-        [ HP.disabled $ isLoading state.repositories
+        [ HP.disabled $ state.isLoading
         , HP.type_ HP.ButtonSubmit
         ]
         [ HH.text "Search" ]
@@ -59,16 +59,10 @@ render state =
     ]
   where
   renderRepositories = case _ of
-    NotAsked ->
-      HH.div_
-        [ HH.text "Repository not loaded" ]
-    Loading ->
-      HH.div_
-        [ HH.text "Loading Repositories" ]
-    Failure err ->
+    Left err ->
       HH.div_
         [ HH.text $ "Failed loading repositories: " <> err ]
-    Success repositories ->
+    Right repositories ->
       HH.div_
         (map renderRepository repositories)
   
@@ -81,11 +75,10 @@ render state =
 handleAction :: forall o m. MonadAff m => Action -> H.HalogenM SearchGitHubRepositoryState Action () o m Unit
 handleAction = case _ of
   SetSearchRepositoryName searchRepositoryName -> do
-    H.modify_ (_ { searchRepositoryName = searchRepositoryName, repositories = NotAsked })
+    H.modify_ (_ { searchRepositoryName = searchRepositoryName })
   SearchRepository event -> do
     H.liftEffect $ Event.preventDefault event
     name <- H.gets _.searchRepositoryName
-    H.modify_ (_ { repositories = Loading })
 
     r <- H.liftAff $ AX.request (defaultRequest 
       { url = "https://api.github.com/search/repositories?q=" <> name <> "&language:purescript&sort=created&order=desc&page=1&per_page=10"
@@ -99,4 +92,4 @@ handleAction = case _ of
     -- curl -H 'Accept: application/vnd.github+json' 'https://api.github.com/search/repositories?q=spago&language:purescript&sort=created&order=desc&page=1&per_page=10'
     response <- H.liftAff $ AX.get AXRF.string ("https://api.github.com/users/" <> name)
     --H.modify_ (_ { result = map _.body (hush response) })
-    H.modify_ (_ { repositories = Success [] })
+    H.modify_ (_ { repositories = Right [] })

@@ -1,4 +1,4 @@
-module Test.Usecase.Main where
+module Test.UseCase.Main where
 
 import Prelude
 

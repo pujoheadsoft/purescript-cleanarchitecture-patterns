@@ -5,7 +5,9 @@ package:
     - effect
     - prelude
     - domains
+    - eta-conversion
   test:
-    main: Test.Usecase.Main
+    main: Test.UseCase.Main
     dependencies:
       - spec
+      - pmock
