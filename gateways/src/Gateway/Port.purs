@@ -25,5 +25,10 @@ type ErrorMessage = String
 type SearchResults = Array SearchResult
 
 type SearchResult = {
-
+  full_name :: String,
+  owner :: {
+    login :: String
+  },
+  html_url :: String,
+  updated_at :: String
 }

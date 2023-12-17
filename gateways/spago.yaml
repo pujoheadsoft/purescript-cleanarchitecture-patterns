@@ -5,6 +5,7 @@ package:
     - effect
     - prelude
     - usecases
+    - js-date
   test:
     main: Test.Gateway.Main
     dependencies: []

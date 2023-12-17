@@ -10,6 +10,7 @@ import Data.Int (fromString)
 import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), split)
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
+import Effect.Aff (Aff)
 import Gateway.GitHubRepositoryGateway (searchByName)
 import Test.PMock (mockFun, (:>))
 import Test.Spec (Spec, describe, it)
@@ -37,7 +38,7 @@ spec = do
           }
         ]
       actual <- runReaderT (searchByName (GitHubRepositoryName "name")) {
-        searchByName: mockFun $ "name" :> Right output
+        searchByName: mockFun $ "name" :> pure@Aff (Right output)
       }
       actual `shouldEqual` expected
 
