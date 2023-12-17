@@ -9,7 +9,7 @@ import Data.Date (Date, canonicalDate)
 import Data.Either (Either(..))
 import Data.Enum (class BoundedEnum, toEnum)
 import Data.Int (fromString)
-import Data.JSDate (parse, toDate)
+import Data.JSDate (JSDate, parse, toDate)
 import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), split)
 import Data.String.Regex (regex, replace)
@@ -46,6 +46,4 @@ searchByName (GitHubRepositoryName name) = do
     }
 
   dateFromString :: String -> m (Maybe Date)
-  dateFromString s = do
-    v <- liftEffect $ parse s
-    pure $ toDate v
+  dateFromString s = toDate <$> (liftEffect $ parse s)
