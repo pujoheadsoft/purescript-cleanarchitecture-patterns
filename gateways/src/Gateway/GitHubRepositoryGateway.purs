@@ -14,7 +14,7 @@ import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), split)
 import Data.String.Regex (regex, replace)
 import Data.Traversable (traverse)
-import Domain.Error (Error)
+import Domain.Error (Error(..))
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (liftEffect)
@@ -32,7 +32,7 @@ searchByName (GitHubRepositoryName name) = do
     Right output -> do
       r <- traverse toRepository output
       pure $ Right $ GitHubRepositories r
-    Left _ -> pure $ Right $ GitHubRepositories []
+    Left e -> pure $ Left $ Error e
 
   where
   toRepository :: SearchResult -> m GitHubRepository

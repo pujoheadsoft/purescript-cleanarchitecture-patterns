@@ -9,6 +9,7 @@ import Data.Enum (class BoundedEnum, toEnum)
 import Data.Int (fromString)
 import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), split)
+import Domain.Error (Error(..))
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
 import Effect.Aff (Aff)
 import Gateway.GitHubRepositoryGateway (searchByName)
@@ -37,9 +38,20 @@ spec = do
             updateDate: GitHubRepositoryUpdateDate $ parse "2023/12/17"
           }
         ]
+
       actual <- runReaderT (searchByName (GitHubRepositoryName "name")) {
         searchByName: mockFun $ "name" :> pure@Aff (Right output)
       }
+
+      actual `shouldEqual` expected
+    
+    it "Failed" do
+      let expected = Left (Error "search error")
+
+      actual <- runReaderT (searchByName (GitHubRepositoryName "name")) {
+        searchByName: mockFun $ "name" :> pure@Aff (Left "search error")
+      }
+
       actual `shouldEqual` expected
 
 parse :: String -> Maybe Date
