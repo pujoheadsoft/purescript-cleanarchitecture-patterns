@@ -5,14 +5,10 @@ module Gateway.GitHubRepositoryGateway
 
 import Prelude
 
-import Data.Date (Date, canonicalDate)
+import Data.Date (Date)
 import Data.Either (Either(..), either)
-import Data.Enum (class BoundedEnum, toEnum)
-import Data.Int (fromString)
-import Data.JSDate (JSDate, parse, toDate)
-import Data.Maybe (Maybe(..))
-import Data.String (Pattern(..), split)
-import Data.String.Regex (regex, replace)
+import Data.JSDate (parse, toDate)
+import Data.Maybe (Maybe)
 import Data.Traversable (traverse)
 import Domain.Error (Error(..))
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
