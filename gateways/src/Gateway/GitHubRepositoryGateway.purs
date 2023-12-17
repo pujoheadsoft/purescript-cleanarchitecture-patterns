@@ -6,7 +6,7 @@ module Gateway.GitHubRepositoryGateway
 import Prelude
 
 import Data.Date (Date, canonicalDate)
-import Data.Either (Either(..))
+import Data.Either (Either(..), either)
 import Data.Enum (class BoundedEnum, toEnum)
 import Data.Int (fromString)
 import Data.JSDate (JSDate, parse, toDate)
@@ -28,11 +28,11 @@ searchByName
   => GitHubRepositoryName
   -> m (Either Error GitHubRepositories)
 searchByName (GitHubRepositoryName name) = do
-  Port.searchByName name >>= case _ of
-    Right output -> do
+  Port.searchByName name >>= either
+    (pure <<< Left <<< Error)
+    \output -> do
       r <- traverse toRepository output
-      pure $ Right $ GitHubRepositories r
-    Left e -> pure $ Left $ Error e
+      (pure <<< Right <<< GitHubRepositories) r
 
   where
   toRepository :: SearchResult -> m GitHubRepository
