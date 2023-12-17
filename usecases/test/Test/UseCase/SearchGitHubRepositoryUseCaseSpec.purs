@@ -7,8 +7,9 @@ import Data.Either (Either(..))
 import Domain.Error (Error(..))
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepositoryName(..))
 import Effect.Aff (Aff)
-import Test.PMock (any, fun, mock, mockFun, verify, verifyCount, verifySequence, (:>))
+import Test.PMock (any, fun, hasBeenCalledInOrder, hasBeenCalledWith, hasNotBeenCalledWith, mock, mockFun, verify, verifyCount, verifySequence, (:>))
 import Test.Spec (Spec, describe, it)
+import UseCase.Port (setErrorMessage, setLoading, setRepositories)
 import UseCase.SearchGitHubRepositoryUseCase (searchRepositoryBy)
 
 spec :: Spec Unit
@@ -33,8 +34,8 @@ spec = do
       }
 
       -- verify
-      verify setRepositories repositories
-      verifySequence setLoading [true, false]
+      setRepositories `hasBeenCalledWith` repositories
+      setLoading `hasBeenCalledInOrder` [true, false]
 
     it "Fail searched" do
       let
@@ -55,6 +56,6 @@ spec = do
       }
 
       -- verify
-      verifyCount setRepositories 0 (any@GitHubRepositories)
-      verify setErrorMessage $ Error "search error"
-      verifySequence setLoading [true, false]
+      setRepositories `hasNotBeenCalledWith` any@GitHubRepositories
+      setErrorMessage `hasBeenCalledWith` Error "search error"
+      setLoading `hasBeenCalledInOrder` [true, false]

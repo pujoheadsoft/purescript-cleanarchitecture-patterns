@@ -3,6 +3,7 @@ module Domain.GitHubRepository where
 import Prelude
 
 import Data.Date (Date)
+import Data.Maybe (Maybe)
 
 newtype GitHubRepositories
   = GitHubRepositories (Array GitHubRepository)
@@ -18,7 +19,7 @@ newtype GitHubRepository
 newtype GitHubRepositoryName = GitHubRepositoryName String
 newtype GitHubRepositoryUrl = GitHubRepositoryUrl String
 newtype GitHubRepositoryOwner = GitHubRepositoryOwner String
-newtype GitHubRepositoryUpdateDate = GitHubRepositoryUpdateDate Date
+newtype GitHubRepositoryUpdateDate = GitHubRepositoryUpdateDate (Maybe Date)
 
 derive newtype instance showRepositories :: Show GitHubRepositories
 derive newtype instance eqRepositories :: Eq GitHubRepositories
