@@ -24,9 +24,11 @@ request :: Aff (Either ErrorMessage SearchResults)
 request = do
   get ResponseFormat.string "https://httpbin.org/ip" >>= either
     (pure <<< Left <<< printError)
-    \r -> case toSearchResult r.body of
-      Left e -> pure <<< Left <<< joinWith "\n" $ renderForeignError <$> toArray e
-      Right v -> pure $ Right v
+    \r -> toSearchResult r.body #
+      either
+        (\e -> pure <<< Left <<< joinWith "\n" $ renderForeignError <$> toArray e)
+        (pure <<< Right)
+        
   where
   toArray :: forall a. NonEmptyList a -> Array a
   toArray = foldl snoc []
