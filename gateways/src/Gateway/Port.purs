@@ -10,13 +10,11 @@ import Type.Equality (class TypeEquals)
 class Monad m <= GitHubRepositoryGatewayPort m where
   searchByName :: String -> m (Either ErrorMessage SearchResults)
 
-type GitHubRepositoryGatewayPortFunction m r
-  = { searchByName :: String -> m (Either ErrorMessage SearchResults)
-    | r
-    }
+type GitHubRepositoryGatewayPortFunction m = 
+  { searchByName :: String -> m (Either ErrorMessage SearchResults) }
 
 instance instancePortReaderT ::
-  (Monad m, TypeEquals f (GitHubRepositoryGatewayPortFunction m r)) =>
+  (Monad m, TypeEquals f (GitHubRepositoryGatewayPortFunction m)) =>
   GitHubRepositoryGatewayPort (ReaderT f m) where
   searchByName = readerT _.searchByName
 

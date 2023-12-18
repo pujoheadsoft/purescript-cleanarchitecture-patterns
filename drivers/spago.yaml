@@ -3,8 +3,8 @@ package:
   dependencies:
     - console
     - effect
+    - aff
+    - affjax-web
+    - simple-json
     - prelude
     - gateways
-  test:
-    main: Test.Driver.Main
-    dependencies: []
