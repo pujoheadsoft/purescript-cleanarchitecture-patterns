@@ -2,17 +2,15 @@ module Driver.GitHubApiDriver where
 
 import Prelude
 
-import Affjax.RequestBody (json)
 import Affjax.RequestHeader (RequestHeader(..))
 import Affjax.ResponseFormat as ResponseFormat
-import Affjax.Web (Request, defaultRequest, get, printError, request)
+import Affjax.Web (Request, defaultRequest, printError, request)
 import Data.Array (snoc)
 import Data.Either (Either(..), either)
 import Data.EtaConversionTransformer ((<<|))
-import Data.List.NonEmpty (NonEmptyList, foldl)
+import Data.List.NonEmpty (foldl)
 import Data.MediaType (MediaType(..))
 import Data.String (joinWith)
-import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Foreign (MultipleErrors, renderForeignError)
 import Gateway.Port (ErrorMessage, GitHubRepositoryGatewayPortFunction, SearchResults)
@@ -22,18 +20,19 @@ gitHubRepositoryGatewayPortFunction :: forall m. MonadAff m => GitHubRepositoryG
 gitHubRepositoryGatewayPortFunction = { searchByName }
 
 searchByName :: forall m. MonadAff m => String -> m (Either ErrorMessage SearchResults)
-searchByName name = do
-  liftAff $ request (searchByNameRequest name) >>= either
+searchByName = doRequest jsonToSearchResult <<| searchByNameRequest
+
+doRequest :: forall m a. MonadAff m => (String -> Either MultipleErrors a) -> Request String -> m (Either ErrorMessage a)
+doRequest f r = do
+  liftAff $ request r >>= either
     (pure <<< Left <<< printError)
     (either
       (pure <<< Left <<< toErrorMessage)
       (pure <<< Right)
-      <<< toSearchResult <<| _.body)
+      <<< f <<| _.body)
 
-  where
-  toErrorMessage :: MultipleErrors -> String
-  toErrorMessage e = joinWith "\n" $ renderForeignError <$> foldl snoc [] e
-
+toErrorMessage :: MultipleErrors -> String
+toErrorMessage e = joinWith "\n" $ renderForeignError <$> foldl snoc [] e
 
 searchByNameRequest :: String -> Request String
 searchByNameRequest name = defaultRequest {
@@ -42,5 +41,5 @@ searchByNameRequest name = defaultRequest {
   responseFormat = ResponseFormat.string
 }
 
-toSearchResult :: String -> Either MultipleErrors SearchResults
-toSearchResult = readJSON
+jsonToSearchResult :: String -> Either MultipleErrors SearchResults
+jsonToSearchResult = readJSON
