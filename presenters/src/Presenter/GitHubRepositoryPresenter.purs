@@ -8,7 +8,7 @@ import Data.DateTime.Instant (fromDate, toDateTime)
 import Data.Either (either, fromRight)
 import Data.EtaConversionTransformer ((<<|))
 import Data.Formatter.DateTime (formatDateTime)
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe(..), fromMaybe, maybe)
 import Data.Newtype (unwrap)
 import Data.Traversable (traverse)
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
@@ -31,12 +31,15 @@ convert (GitHubRepository {
   name: (GitHubRepositoryName n), 
   owner: (GitHubRepositoryOwner o), 
   url: (GitHubRepositoryUrl u), 
-  updateDate: (GitHubRepositoryUpdateDate date) }) = 
-  {
+  updateDate: (GitHubRepositoryUpdateDate d) }) = 
+  let
+    date = either (const Nothing) Just =<< format <$> toDate <$> d
+  in {
     name: n,
     owner: o,
     url: u,
-    updateDate: maybe "-" (fromRight "-" <<< formatDateTime "YYYY/MM/DD" <<| toDate) date
+    updateDate: fromMaybe "-" date
   }
   where
+  format = formatDateTime "YYYY/MM/DD"
   toDate = toDateTime <<< fromDate
