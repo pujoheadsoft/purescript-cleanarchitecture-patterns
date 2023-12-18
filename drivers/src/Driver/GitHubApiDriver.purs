@@ -3,12 +3,11 @@ module Driver.GitHubApiDriver where
 import Prelude
 
 import Affjax.ResponseFormat as ResponseFormat
-import Affjax.Web (Error, get, printError)
-import Data.Array (cons, snoc)
-import Data.Either (Either(..))
-import Data.List.NonEmpty (foldl, foldr, toList)
+import Affjax.Web (get, printError)
+import Data.Array (snoc)
+import Data.Either (Either(..), either)
+import Data.List.NonEmpty (NonEmptyList, foldl)
 import Data.String (joinWith)
-import Data.Traversable (traverse)
 import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff)
 import Foreign (MultipleErrors, renderForeignError)
@@ -23,13 +22,14 @@ searchByName s = pure $ Right []
 
 request :: Aff (Either ErrorMessage SearchResults)
 request = do
-  res <- get ResponseFormat.string "https://httpbin.org/ip"
-  case res of
-    Left e -> pure $ Left $ printError e
-    Right r -> do
-      case toSearchResult r.body of
-        Left e -> pure $ Left $ joinWith "\n" $ foldl snoc [] (renderForeignError <$> e)
-        Right v -> pure $ Right v
+  get ResponseFormat.string "https://httpbin.org/ip" >>= either
+    (pure <<< Left <<< printError)
+    \r -> case toSearchResult r.body of
+      Left e -> pure <<< Left <<< joinWith "\n" $ renderForeignError <$> toArray e
+      Right v -> pure $ Right v
+  where
+  toArray :: forall a. NonEmptyList a -> Array a
+  toArray = foldl snoc []
 
 toSearchResult :: String -> Either MultipleErrors SearchResults
 toSearchResult = readJSON
