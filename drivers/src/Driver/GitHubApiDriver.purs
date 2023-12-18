@@ -13,7 +13,7 @@ import Data.List.NonEmpty (NonEmptyList, foldl)
 import Data.MediaType (MediaType(..))
 import Data.String (joinWith)
 import Effect.Aff (Aff)
-import Effect.Aff.Class (class MonadAff)
+import Effect.Aff.Class (class MonadAff, liftAff)
 import Foreign (MultipleErrors, renderForeignError)
 import Gateway.Port (ErrorMessage, GitHubRepositoryGatewayPortFunction, SearchResults)
 import Simple.JSON (readJSON)
@@ -22,17 +22,14 @@ gitHubRepositoryGatewayPortFunction :: forall m. MonadAff m => GitHubRepositoryG
 gitHubRepositoryGatewayPortFunction = { searchByName }
 
 searchByName :: forall m. MonadAff m => String -> m (Either ErrorMessage SearchResults)
-searchByName s = pure $ Right []
-
-x :: String -> Aff (Either ErrorMessage SearchResults)
-x name = do
+searchByName name = do
   let
     r = defaultRequest {
       url = "https://api.github.com/search/repositories?q=" <> name <> "&language:purescript&sort=created&order=desc&page=1&per_page=10",
       headers = [Accept $ MediaType "application/vnd.github+json"],
       responseFormat = ResponseFormat.string
     }
-  request r >>= either
+  liftAff $ request r >>= either
     (pure <<< Left <<< printError)
     (either
       (pure <<< Left <<< toErrorMessage)
