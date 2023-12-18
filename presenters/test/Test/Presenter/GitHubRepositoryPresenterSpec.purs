@@ -11,8 +11,9 @@ import Data.String (Pattern(..), split)
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
 import Effect.Aff (Aff)
 import Presenter.GitHubRepositoryPresenter (setRepositories)
+import State.SearchGitHubRepositoryState (ErrorMessage)
 import State.SearchGitHubRepositoryState as State
-import Test.PMock (any, fun, hasBeenCalledWith, mock, (:>))
+import Test.PMock (any, fun, hasBeenCalledWith, mock, mockFun, (:>))
 import Test.Spec (Spec, describe, it)
 
 spec :: Spec Unit
@@ -30,7 +31,9 @@ spec = do
         ]
         stateMock = mock $ any@State.GitHubRepositories :> pure@Aff unit
       _ <- runReaderT (setRepositories repositories) {
-        setRepositories: fun stateMock
+        setRepositories: fun stateMock,
+        setLoading: mockFun $ any@Boolean :> pure@Aff unit,
+        setErrorMessage: mockFun $ any@ErrorMessage :> pure@Aff unit
       }
       stateMock `hasBeenCalledWith` [
         {

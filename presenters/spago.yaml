@@ -6,6 +6,7 @@ package:
     - console
     - effect
     - prelude
+    - formatters
   test:
     main: Test.Presenter.Main
     dependencies: []
