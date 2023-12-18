@@ -10,7 +10,7 @@ import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), split)
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
 import Effect.Aff (Aff)
-import Presenter.GitHubRepositoryPresenter (setRepositories)
+import Presenter.GitHubRepositoryPresenter (setLoading, setRepositories)
 import State.SearchGitHubRepositoryState (ErrorMessage)
 import State.SearchGitHubRepositoryState as State
 import Test.PMock (any, fun, hasBeenCalledWith, mock, mockFun, (:>))
@@ -18,7 +18,7 @@ import Test.Spec (Spec, describe, it)
 
 spec :: Spec Unit
 spec = do
-  describe "" do
+  describe "Presenter" do
     it "setRepository" do
       let 
         repositories = GitHubRepositories [
@@ -43,6 +43,16 @@ spec = do
           updateDate: "2023/12/18"
         }
       ]
+    
+    it "setLoading" do
+      let 
+        stateMock = mock $ any@Boolean :> pure@Aff unit
+      _ <- runReaderT (setLoading true) {
+        setRepositories: mockFun $ any@State.GitHubRepositories :> pure@Aff unit,
+        setLoading: fun stateMock,
+        setErrorMessage: mockFun $ any@ErrorMessage :> pure@Aff unit
+      }
+      stateMock `hasBeenCalledWith` true
 
 
 parse :: String -> Maybe Date

@@ -36,3 +36,11 @@ convert (GitHubRepository {
   where
   format = formatDateTime "YYYY/MM/DD"
   toDate = toDateTime <<< fromDate
+
+setLoading
+  :: forall m
+   . Monad m
+  => GitHubRepositoryPresenterPort m
+  => Boolean
+  -> m Unit
+setLoading = Port.setLoading
