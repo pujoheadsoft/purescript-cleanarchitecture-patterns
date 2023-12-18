@@ -2,15 +2,10 @@ module Presenter.GitHubRepositoryPresenter where
 
 import Prelude
 
-import Control.Alt ((<|>))
-import Data.Date (day, month, year)
 import Data.DateTime.Instant (fromDate, toDateTime)
-import Data.Either (either, fromRight)
-import Data.EtaConversionTransformer ((<<|))
+import Data.Either (either)
 import Data.Formatter.DateTime (formatDateTime)
-import Data.Maybe (Maybe(..), fromMaybe, maybe)
-import Data.Newtype (unwrap)
-import Data.Traversable (traverse)
+import Data.Maybe (Maybe(..), fromMaybe)
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
 import Presenter.Port (class GitHubRepositoryPresenterPort)
 import Presenter.Port as Port
@@ -22,9 +17,7 @@ setRepositories
   => GitHubRepositoryPresenterPort m
   => GitHubRepositories
   -> m Unit
-setRepositories (GitHubRepositories r) = do
-  let repositories = convert <$> r
-  Port.setRepositories repositories
+setRepositories (GitHubRepositories r) = Port.setRepositories $ convert <$> r
 
 convert :: GitHubRepository -> State.GitHubRepository
 convert (GitHubRepository { 
