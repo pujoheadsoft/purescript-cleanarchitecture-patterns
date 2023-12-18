@@ -23,8 +23,8 @@ searchByName :: forall m. MonadAff m => String -> m (Either ErrorMessage SearchR
 searchByName = doRequest jsonToSearchResult <<| searchByNameRequest
 
 doRequest :: forall m a. MonadAff m => (String -> Either MultipleErrors a) -> Request String -> m (Either ErrorMessage a)
-doRequest f r = do
-  liftAff $ request r >>= either
+doRequest f r = liftAff do
+  request r >>= either
     (pure <<< Left <<< printError)
     (either
       (pure <<< Left <<< toErrorMessage)
