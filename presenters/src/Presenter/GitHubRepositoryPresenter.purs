@@ -6,6 +6,7 @@ import Control.Alt ((<|>))
 import Data.Date (day, month, year)
 import Data.DateTime.Instant (fromDate, toDateTime)
 import Data.Either (either, fromRight)
+import Data.EtaConversionTransformer ((<<|))
 import Data.Formatter.DateTime (formatDateTime)
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (unwrap)
@@ -31,15 +32,11 @@ convert (GitHubRepository {
   owner: (GitHubRepositoryOwner o), 
   url: (GitHubRepositoryUrl u), 
   updateDate: (GitHubRepositoryUpdateDate date) }) = 
-  let
-    z = maybe "" (\date -> do
-      fromRight "" $ formatDateTime "YYYY/MM/DD" (toDate date)
-    ) date
-  in {
+  {
     name: n,
     owner: o,
     url: u,
-    updateDate: z
+    updateDate: maybe "-" (fromRight "-" <<< formatDateTime "YYYY/MM/DD" <<| toDate) date
   }
   where
   toDate = toDateTime <<< fromDate
