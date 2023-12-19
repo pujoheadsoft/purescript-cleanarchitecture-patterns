@@ -1,10 +1,12 @@
 module Gateway.GitHubRepositoryGateway
   ( searchByName
+  , gitHubRepositoryPortFunction
   )
   where
 
 import Prelude
 
+import Control.Monad.Reader (runReaderT)
 import Data.Date (Date)
 import Data.Either (Either(..), either)
 import Data.JSDate (parse, toDate)
@@ -14,8 +16,9 @@ import Domain.Error (Error(..))
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (liftEffect)
-import Gateway.Port (class GitHubRepositoryGatewayPort, SearchResult)
+import Gateway.Port (class GitHubRepositoryGatewayPort, SearchResult, GitHubRepositoryGatewayPortFunction)
 import Gateway.Port as Port
+import UseCase.Port (GitHubRepositoryPortFunction)
 
 searchByName
   :: forall m
@@ -41,3 +44,9 @@ searchByName (GitHubRepositoryName name) = do
 
   dateFromString :: String -> m (Maybe Date)
   dateFromString s = toDate <$> (liftEffect $ parse s)
+
+
+gitHubRepositoryPortFunction :: forall m. MonadAff m => GitHubRepositoryGatewayPortFunction m -> GitHubRepositoryPortFunction m ()
+gitHubRepositoryPortFunction f = {
+  searchByName: \name -> runReaderT (searchByName name) f
+}

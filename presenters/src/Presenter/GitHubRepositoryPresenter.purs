@@ -2,15 +2,17 @@ module Presenter.GitHubRepositoryPresenter where
 
 import Prelude
 
+import Control.Monad.Reader (runReaderT)
 import Data.DateTime.Instant (fromDate, toDateTime)
 import Data.Either (either)
 import Data.Formatter.DateTime (formatDateTime)
 import Data.Maybe (Maybe(..), fromMaybe)
+import Domain.Error (Error(..))
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
-import Presenter.Port (class GitHubRepositoryPresenterPort)
+import Presenter.Port (class GitHubRepositoryPresenterPort, GitHubRepositoryPresenterPortFunction)
 import Presenter.Port as Port
-import State.SearchGitHubRepositoryState (ErrorMessage)
 import State.SearchGitHubRepositoryState as State
+import UseCase.Port as UseCasePort
 
 setRepositories
   :: forall m
@@ -50,6 +52,13 @@ setErrorMessage
   :: forall m
    . Monad m
   => GitHubRepositoryPresenterPort m
-  => ErrorMessage
+  => Error
   -> m Unit
-setErrorMessage = Port.setErrorMessage
+setErrorMessage (Error e) = Port.setErrorMessage e
+
+gitHubRepositoryPresenterPortFunction :: forall m. Monad m => GitHubRepositoryPresenterPortFunction m -> UseCasePort.GitHubRepositoryPresenterPortFunction m ()
+gitHubRepositoryPresenterPortFunction f = {
+  setRepositories: \e -> runReaderT (setRepositories e) f,
+  setLoading: \e -> runReaderT (setLoading e) f,
+  setErrorMessage: \e -> runReaderT (setErrorMessage e) f
+}

@@ -1,0 +1,16 @@
+package:
+  name: controllers
+  dependencies:
+    - console
+    - effect
+    - prelude
+    - usecases
+    - gateways
+    - presenters
+    - state
+    - drivers
+  test:
+    main: Test.UseCase.Main
+    dependencies:
+      - spec
+      - pmock

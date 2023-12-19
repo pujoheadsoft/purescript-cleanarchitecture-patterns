@@ -8,6 +8,7 @@ import Data.Enum (class BoundedEnum, toEnum)
 import Data.Int (fromString)
 import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), split)
+import Domain.Error (Error(..))
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
 import Effect.Aff (Aff)
 import Presenter.GitHubRepositoryPresenter (setErrorMessage, setLoading, setRepositories)
@@ -54,7 +55,7 @@ spec = do
     it "setErrorMessage" do
       let 
         stateMock = mock $ any@ErrorMessage :> pure@Aff unit
-      _ <- runReaderT (setErrorMessage "error") defaultMockFunctions {
+      _ <- runReaderT (setErrorMessage $ Error "error") defaultMockFunctions {
         setErrorMessage = fun stateMock
       }
       stateMock `hasBeenCalledWith` "error"

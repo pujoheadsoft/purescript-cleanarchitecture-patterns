@@ -12,10 +12,9 @@ import Type.Equality (class TypeEquals)
 class Monad m <= GitHubRepositoryPort m where
   searchByName :: GitHubRepositoryName -> m (Either Error GitHubRepositories)
 
-type GitHubRepositoryPortFunction m r
-  = { searchByName :: GitHubRepositoryName -> m (Either Error GitHubRepositories)
-    | r
-    }
+type GitHubRepositoryPortFunction m r = { 
+  searchByName :: GitHubRepositoryName -> m (Either Error GitHubRepositories) | r
+}
 
 instance instancePortReaderT ::
   (Monad m, TypeEquals f (GitHubRepositoryPortFunction m r)) =>
@@ -27,12 +26,12 @@ class Monad m <= GitHubRepositoryPresenterPort m where
   setLoading :: Boolean -> m Unit
   setErrorMessage :: Error -> m Unit
 
-type GitHubRepositoryPresenterPortFunction m r
-  = { setRepositories :: GitHubRepositories -> m Unit
-    , setLoading :: Boolean -> m Unit
-    , setErrorMessage :: Error -> m Unit
-    | r
-    }
+type GitHubRepositoryPresenterPortFunction m r = {
+  setRepositories :: GitHubRepositories -> m Unit,
+  setLoading :: Boolean -> m Unit,
+  setErrorMessage :: Error -> m Unit
+  | r
+}
 
 instance instancePresenterReaderT ::
   (Monad m, TypeEquals f (GitHubRepositoryPresenterPortFunction m r)) =>
