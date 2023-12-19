@@ -46,7 +46,13 @@ searchByName (GitHubRepositoryName name) = do
   dateFromString s = toDate <$> (liftEffect $ parse s)
 
 
-gitHubRepositoryPortFunction :: forall m. MonadAff m => GitHubRepositoryGatewayPortFunction m -> GitHubRepositoryPortFunction m ()
+gitHubRepositoryPortFunction
+  :: forall m
+   . MonadAff m
+  => GitHubRepositoryGatewayPortFunction m
+  -> GitHubRepositoryPortFunction m ()
 gitHubRepositoryPortFunction f = {
-  searchByName: \name -> runReaderT (searchByName name) f
-}
+    searchByName: run <<< searchByName
+  }
+  where
+  run = flip runReaderT f

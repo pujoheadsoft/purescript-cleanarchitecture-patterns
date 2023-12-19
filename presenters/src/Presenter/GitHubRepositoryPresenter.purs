@@ -62,7 +62,9 @@ gitHubRepositoryPresenterPortFunction
   => GitHubRepositoryPresenterPortFunction m
   -> GitHubRepositoryOutputPortFunction m ()
 gitHubRepositoryPresenterPortFunction f = {
-  setRepositories: \e -> runReaderT (setRepositories e) f,
-  setLoading: \e -> runReaderT (setLoading e) f,
-  setErrorMessage: \e -> runReaderT (setErrorMessage e) f
-}
+    setRepositories: run <<< setRepositories,
+    setLoading: run <<< setLoading,
+    setErrorMessage: run <<< setErrorMessage
+  }
+  where
+  run = flip runReaderT f
