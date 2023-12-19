@@ -58,8 +58,9 @@ render state =
   
   renderRepository repository =
     HH.div_
-      [ HH.text repository.name
-      , HH.text repository.owner
+      [ HH.text repository.owner
+      , HH.a [HP.href repository.url ] [ HH.text repository.name ]
+      , HH.text repository.updateDate
       ]
 
 handleAction :: forall o m. MonadAff m => Action -> H.HalogenM SearchGitHubRepositoryState Action () o m Unit
