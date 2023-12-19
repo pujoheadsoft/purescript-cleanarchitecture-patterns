@@ -7,10 +7,9 @@ import Data.Either (Either(..))
 import Domain.Error (Error(..))
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepositoryName(..))
 import Effect.Aff (Aff)
-import Test.PMock (any, fun, hasBeenCalledInOrder, hasBeenCalledWith, hasNotBeenCalledWith, mock, mockFun, verify, verifyCount, verifySequence, (:>))
+import Test.PMock (any, fun, hasBeenCalledInOrder, hasBeenCalledWith, hasNotBeenCalledWith, mock, mockFun, (:>))
 import Test.Spec (Spec, describe, it)
-import UseCase.Port (setErrorMessage, setLoading, setRepositories)
-import UseCase.SearchGitHubRepositoryUseCase (searchRepositoryBy)
+import UseCase.SearchGitHubRepositoryUseCase (execute)
 
 spec :: Spec Unit
 spec = do
@@ -26,7 +25,7 @@ spec = do
         setRepositories = mock $ any :> pure@Aff unit
 
       -- sut
-      _ <- runReaderT (searchRepositoryBy name) {
+      _ <- runReaderT (execute name) {
         searchByName: fun searchByName,
         setRepositories: fun setRepositories,
         setLoading: fun setLoading,
@@ -48,7 +47,7 @@ spec = do
         setErrorMessage = mock $ any@Error :> pure@Aff unit
 
       -- sut
-      _ <- runReaderT (searchRepositoryBy name) {
+      _ <- runReaderT (execute name) {
         searchByName: fun searchByName,
         setRepositories: fun setRepositories,
         setLoading: fun setLoading,

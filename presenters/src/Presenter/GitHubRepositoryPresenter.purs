@@ -12,7 +12,7 @@ import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), Gi
 import Presenter.Port (class GitHubRepositoryPresenterPort, GitHubRepositoryPresenterPortFunction)
 import Presenter.Port as Port
 import State.SearchGitHubRepositoryState as State
-import UseCase.Port as UseCasePort
+import UseCase.Port (GitHubRepositoryOutputPortFunction)
 
 setRepositories
   :: forall m
@@ -56,7 +56,11 @@ setErrorMessage
   -> m Unit
 setErrorMessage (Error e) = Port.setErrorMessage e
 
-gitHubRepositoryPresenterPortFunction :: forall m. Monad m => GitHubRepositoryPresenterPortFunction m -> UseCasePort.GitHubRepositoryPresenterPortFunction m ()
+gitHubRepositoryPresenterPortFunction
+  :: forall m
+   . Monad m
+  => GitHubRepositoryPresenterPortFunction m
+  -> GitHubRepositoryOutputPortFunction m ()
 gitHubRepositoryPresenterPortFunction f = {
   setRepositories: \e -> runReaderT (setRepositories e) f,
   setLoading: \e -> runReaderT (setLoading e) f,

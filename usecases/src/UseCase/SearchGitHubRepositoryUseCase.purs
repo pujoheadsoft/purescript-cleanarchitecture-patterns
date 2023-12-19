@@ -4,15 +4,15 @@ import Prelude
 
 import Data.Either (either)
 import Domain.GitHubRepository (GitHubRepositoryName)
-import UseCase.Port (class GitHubRepositoryPort, class GitHubRepositoryPresenterPort, searchByName, setErrorMessage, setLoading, setRepositories)
+import UseCase.Port (class GitHubRepositoryPort, class GitHubRepositoryOutputPort, searchByName, setErrorMessage, setLoading, setRepositories)
 
-searchRepositoryBy
+execute
   :: forall m
    . GitHubRepositoryPort m
-  => GitHubRepositoryPresenterPort m
+  => GitHubRepositoryOutputPort m
   => GitHubRepositoryName
   -> m Unit
-searchRepositoryBy name = do
+execute name = do
   setLoading true
   searchByName name >>= either setErrorMessage setRepositories
   setLoading false

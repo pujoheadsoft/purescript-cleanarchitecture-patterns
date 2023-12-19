@@ -12,7 +12,7 @@ import Gateway.GitHubRepositoryGateway (gitHubRepositoryPortFunction)
 import Presenter.GitHubRepositoryPresenter (gitHubRepositoryPresenterPortFunction)
 import Record.Builder (build, merge)
 import State.SearchGitHubRepositoryState (SearchGitHubRepositoryState)
-import UseCase.SearchGitHubRepositoryUseCase (searchRepositoryBy)
+import UseCase.SearchGitHubRepositoryUseCase (execute)
 
 searchRepositoryByName
  :: forall m
@@ -26,4 +26,4 @@ searchRepositoryByName name = do
     gf = gitHubRepositoryPortFunction gitHubRepositoryGatewayPortFunction
     pf = gitHubRepositoryPresenterPortFunction presenterPortFunction 
     functions = build (merge (gf)) pf
-  runReaderT (searchRepositoryBy (GitHubRepositoryName name)) functions
+  runReaderT (execute (GitHubRepositoryName name)) functions

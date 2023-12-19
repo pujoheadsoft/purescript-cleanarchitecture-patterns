@@ -16,26 +16,26 @@ type GitHubRepositoryPortFunction m r = {
   searchByName :: GitHubRepositoryName -> m (Either Error GitHubRepositories) | r
 }
 
-instance instancePortReaderT ::
+instance portReaderT ::
   (Monad m, TypeEquals f (GitHubRepositoryPortFunction m r)) =>
   GitHubRepositoryPort (ReaderT f m) where
   searchByName = readerT _.searchByName
 
-class Monad m <= GitHubRepositoryPresenterPort m where
+class Monad m <= GitHubRepositoryOutputPort m where
   setRepositories :: GitHubRepositories -> m Unit
   setLoading :: Boolean -> m Unit
   setErrorMessage :: Error -> m Unit
 
-type GitHubRepositoryPresenterPortFunction m r = {
+type GitHubRepositoryOutputPortFunction m r = {
   setRepositories :: GitHubRepositories -> m Unit,
   setLoading :: Boolean -> m Unit,
   setErrorMessage :: Error -> m Unit
   | r
 }
 
-instance instancePresenterReaderT ::
-  (Monad m, TypeEquals f (GitHubRepositoryPresenterPortFunction m r)) =>
-  GitHubRepositoryPresenterPort (ReaderT f m) where
+instance outputPortReaderT ::
+  (Monad m, TypeEquals f (GitHubRepositoryOutputPortFunction m r)) =>
+  GitHubRepositoryOutputPort (ReaderT f m) where
   setRepositories = readerT _.setRepositories
   setLoading = readerT _.setLoading
   setErrorMessage = readerT _.setErrorMessage
