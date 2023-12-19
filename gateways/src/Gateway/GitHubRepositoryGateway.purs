@@ -29,7 +29,7 @@ searchByName
 searchByName (GitHubRepositoryName name) = do
   Port.searchByName name >>= either
     (pure <<< Left <<< Error)
-    (pure <<< Right <<< GitHubRepositories <=< traverse toRepository)
+    (pure <<< Right <<< GitHubRepositories <=< traverse toRepository <<< _.items)
 
   where
   toRepository :: SearchResult -> m GitHubRepository

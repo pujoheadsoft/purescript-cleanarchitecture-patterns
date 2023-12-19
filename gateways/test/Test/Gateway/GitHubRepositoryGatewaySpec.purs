@@ -22,14 +22,18 @@ spec = do
   describe "Search GitHub Repository By Repository Name" do
     it "Success" do
       let
-        output = [{
-          full_name: "nameX",
-          owner: {
-            login: "user"
-          },
-          html_url: "http://url",
-          updated_at: "2023-12-17T14:17:49Z"
-        }]
+        output = {
+          items: [
+            {
+              full_name: "nameX",
+              owner: {
+                login: "user"
+              },
+              html_url: "http://url",
+              updated_at: "2023-12-17T14:17:49Z"
+            }
+          ]
+        }
         expected = Right $ GitHubRepositories [
           GitHubRepository { 
             name: GitHubRepositoryName "nameX",

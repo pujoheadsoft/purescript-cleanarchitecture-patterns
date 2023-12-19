@@ -20,7 +20,7 @@ instance instancePortReaderT ::
 
 type ErrorMessage = String
 
-type SearchResults = Array SearchResult
+type SearchResults = { items :: Array SearchResult }
 
 type SearchResult = {
   full_name :: String,
