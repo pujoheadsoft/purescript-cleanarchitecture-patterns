@@ -26,7 +26,7 @@ component =
     }
 
 initialState :: forall i. i -> SearchGitHubRepositoryState
-initialState _ = { searchRepositoryName: "", repositories: Right [], isLoading: false }
+initialState _ = { searchRepositoryName: mempty, repositories: Right mempty, isLoading: false }
 
 render :: forall m. SearchGitHubRepositoryState -> H.ComponentHTML Action () m
 render state =
@@ -50,11 +50,9 @@ render state =
   where
   renderRepositories = case _ of
     Left err ->
-      HH.div_
-        [ HH.text $ "Failed loading repositories: " <> err ]
+      HH.div_ [ HH.text $ "Failed loading repositories: " <> err ]
     Right repositories ->
-      HH.div_
-        (map renderRepository repositories)
+      HH.div_ (renderRepository <$> repositories)
   
   renderRepository repository =
     HH.div_
@@ -67,6 +65,7 @@ handleAction :: forall o m. MonadAff m => Action -> H.HalogenM SearchGitHubRepos
 handleAction = case _ of
   SetSearchRepositoryName searchRepositoryName -> do
     H.modify_ (_ { searchRepositoryName = searchRepositoryName })
+
   SearchRepository event -> do
     H.liftEffect $ Event.preventDefault event
     searchRepositoryByName =<< H.gets _.searchRepositoryName
