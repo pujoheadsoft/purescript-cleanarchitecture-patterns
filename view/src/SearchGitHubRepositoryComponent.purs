@@ -55,10 +55,11 @@ render state =
       HH.div_ (renderRepository <$> repositories)
   
   renderRepository repository =
-    HH.div_
-      [ HH.text repository.owner
-      , HH.a [HP.href repository.url ] [ HH.text repository.name ]
-      , HH.text repository.updateDate
+    HH.div
+      [ HP.style "display: flex; column-gap: 10px;" ] 
+      [ HH.div_ [HH.text repository.owner]
+      , HH.div_ [HH.a [HP.href repository.url ] [ HH.text repository.name ]]
+      , HH.div_ [HH.text repository.updateDate]
       ]
 
 handleAction :: forall o m. MonadAff m => Action -> H.HalogenM SearchGitHubRepositoryState Action () o m Unit
