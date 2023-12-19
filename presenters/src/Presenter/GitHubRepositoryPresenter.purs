@@ -9,6 +9,7 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
 import Presenter.Port (class GitHubRepositoryPresenterPort)
 import Presenter.Port as Port
+import State.SearchGitHubRepositoryState (ErrorMessage)
 import State.SearchGitHubRepositoryState as State
 
 setRepositories
@@ -44,3 +45,11 @@ setLoading
   => Boolean
   -> m Unit
 setLoading = Port.setLoading
+
+setErrorMessage
+  :: forall m
+   . Monad m
+  => GitHubRepositoryPresenterPort m
+  => ErrorMessage
+  -> m Unit
+setErrorMessage = Port.setErrorMessage

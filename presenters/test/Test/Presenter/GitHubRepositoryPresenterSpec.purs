@@ -10,7 +10,8 @@ import Data.Maybe (Maybe(..))
 import Data.String (Pattern(..), split)
 import Domain.GitHubRepository (GitHubRepositories(..), GitHubRepository(..), GitHubRepositoryName(..), GitHubRepositoryOwner(..), GitHubRepositoryUpdateDate(..), GitHubRepositoryUrl(..))
 import Effect.Aff (Aff)
-import Presenter.GitHubRepositoryPresenter (setLoading, setRepositories)
+import Presenter.GitHubRepositoryPresenter (setErrorMessage, setLoading, setRepositories)
+import Presenter.Port (GitHubRepositoryPresenterPortFunction)
 import State.SearchGitHubRepositoryState (ErrorMessage)
 import State.SearchGitHubRepositoryState as State
 import Test.PMock (any, fun, hasBeenCalledWith, mock, mockFun, (:>))
@@ -30,10 +31,8 @@ spec = do
           }
         ]
         stateMock = mock $ any@State.GitHubRepositories :> pure@Aff unit
-      _ <- runReaderT (setRepositories repositories) {
-        setRepositories: fun stateMock,
-        setLoading: mockFun $ any@Boolean :> pure@Aff unit,
-        setErrorMessage: mockFun $ any@ErrorMessage :> pure@Aff unit
+      _ <- runReaderT (setRepositories repositories) defaultMockFunctions {
+        setRepositories = fun stateMock
       }
       stateMock `hasBeenCalledWith` [
         {
@@ -47,13 +46,25 @@ spec = do
     it "setLoading" do
       let 
         stateMock = mock $ any@Boolean :> pure@Aff unit
-      _ <- runReaderT (setLoading true) {
-        setRepositories: mockFun $ any@State.GitHubRepositories :> pure@Aff unit,
-        setLoading: fun stateMock,
-        setErrorMessage: mockFun $ any@ErrorMessage :> pure@Aff unit
+      _ <- runReaderT (setLoading true) defaultMockFunctions {
+        setLoading = fun stateMock
       }
       stateMock `hasBeenCalledWith` true
 
+    it "setErrorMessage" do
+      let 
+        stateMock = mock $ any@ErrorMessage :> pure@Aff unit
+      _ <- runReaderT (setErrorMessage "error") defaultMockFunctions {
+        setErrorMessage = fun stateMock
+      }
+      stateMock `hasBeenCalledWith` "error"
+
+defaultMockFunctions :: GitHubRepositoryPresenterPortFunction Aff
+defaultMockFunctions = {
+  setRepositories: mockFun $ any@State.GitHubRepositories :> pure@Aff unit,
+  setLoading: mockFun $ any@Boolean :> pure@Aff unit,
+  setErrorMessage: mockFun $ any@ErrorMessage :> pure@Aff unit
+}
 
 parse :: String -> Maybe Date
 parse s = case split (Pattern "/") s of
