@@ -2,15 +2,11 @@ module SearchGitHubRepositoryComponent where
 
 import Prelude
 
-import CSS (display, flex, px, textOverflow, width)
-import CSS.Overflow (hidden, overflow)
-import CSS.Text.Overflow (ellipsis)
 import Controller.GitHubRepositoryController (searchRepositoryByName)
 import Data.Either (Either(..))
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
-import Halogen.HTML.CSS as CSS
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import State.SearchGitHubRepositoryState (SearchGitHubRepositoryState)
