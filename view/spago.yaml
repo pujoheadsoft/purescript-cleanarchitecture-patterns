@@ -12,4 +12,5 @@ package:
     - drivers
     - halogen
     - affjax-web
+    - halogen-css
   main: UserTodo.Main

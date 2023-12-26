@@ -2,11 +2,15 @@ module SearchGitHubRepositoryComponent where
 
 import Prelude
 
+import CSS (CSS, px, textOverflow, textWhitespace, whitespaceNoWrap, width)
+import CSS.Overflow (hidden, overflow)
+import CSS.Text.Overflow (ellipsis)
 import Controller.GitHubRepositoryController (searchRepositoryByName)
 import Data.Either (Either(..))
 import Effect.Aff.Class (class MonadAff)
 import Halogen as H
 import Halogen.HTML as HH
+import Halogen.HTML.CSS as CSS
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import State.SearchGitHubRepositoryState (SearchGitHubRepositoryState)
@@ -62,9 +66,21 @@ render state =
       , HH.div [styleUpdateDate] [HH.text repository.updateDate]
       ]
   styleContainer = HP.style "display: flex; column-gap: 8px;"
-  styleOwner = HP.style "width: 150px; overflow: hidden; text-overflow: ellipsis; text-wrap: nowrap;"
-  styleUrl = HP.style "width: 350px; overflow: hidden; text-overflow: ellipsis; text-wrap: nowrap;"
-  styleUpdateDate = HP.style "width: 100px;"
+
+  styleOwner = CSS.style do
+    width $ px 150.0
+    overflow hidden
+    textWhitespace whitespaceNoWrap
+    textOverflow ellipsis
+
+  styleUrl = CSS.style do
+    width $ px 350.0
+    overflow hidden
+    textWhitespace whitespaceNoWrap
+    textOverflow ellipsis
+
+  styleUpdateDate = CSS.style do 
+    width $ px 100.0
 
 handleAction :: forall o m. MonadAff m => Action -> H.HalogenM SearchGitHubRepositoryState Action () o m Unit
 handleAction = case _ of
