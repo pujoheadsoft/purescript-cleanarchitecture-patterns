@@ -14,12 +14,10 @@ import Halogen.HTML.CSS as CSS
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import State.SearchGitHubRepositoryState (SearchGitHubRepositoryState)
-import Web.Event.Event (Event)
-import Web.Event.Event as Event
 
 data Action
   = SetSearchRepositoryName String
-  | SearchRepository Event
+  | SearchRepository
 
 component :: forall q i o m. MonadAff m => H.Component q i o m
 component =
@@ -34,8 +32,7 @@ initialState _ = { searchRepositoryName: mempty, repositories: Right mempty, isL
 
 render :: forall m. SearchGitHubRepositoryState -> H.ComponentHTML Action () m
 render state =
-  HH.form
-    [ HE.onSubmit SearchRepository ]
+  HH.div_
     [ HH.h1_ [ HH.text "Search GitHub Repository" ]
     , HH.label_
         [ HH.div_ [ HH.text "Enter repository name:" ]
@@ -46,7 +43,7 @@ render state =
         ]
     , HH.button
         [ HP.disabled $ state.isLoading
-        , HP.type_ HP.ButtonSubmit
+        , HE.onClick \_ -> SearchRepository
         ]
         [ HH.text "Search" ]
     , renderRepositories state.repositories
@@ -87,6 +84,5 @@ handleAction = case _ of
   SetSearchRepositoryName searchRepositoryName -> do
     H.modify_ (_ { searchRepositoryName = searchRepositoryName })
 
-  SearchRepository event -> do
-    H.liftEffect $ Event.preventDefault event
+  SearchRepository -> do
     searchRepositoryByName =<< H.gets _.searchRepositoryName

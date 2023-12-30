@@ -36,7 +36,7 @@ toErrorMessage e = joinWith "\n" $ renderForeignError <$> foldl snoc [] e
 
 searchByNameRequest :: String -> Request String
 searchByNameRequest name = defaultRequest {
-  url = "https://api.github.com/search/repositories?q=" <> name <> "&language:purescript&sort=created&order=desc&page=1&per_page=10",
+  url = "https://api.github.com/search/repositories?q=" <> name <> "%20in%3Aname%20language%3Apurescript&sort=updated&order=desc&page=1&per_page=10",
   headers = [Accept $ MediaType "application/vnd.github+json"],
   responseFormat = ResponseFormat.string
 }
